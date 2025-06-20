@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+
+class ProductPolicy
+{
+    /**
+     * Bepaalt of de gebruiker toegang heeft tot de lijst met producten (index).
+     */
+    public function viewAny(User $user): bool
+    {
+        // Gebruiker moet de 'view product' permission hebben
+        return $user->can('view product');
+    }
+
+    /**
+     * Bepaalt of de gebruiker een specifiek product mag bekijken.
+     */
+    public function view(User $user, Product $product): bool
+    {
+        // Voor nu: zolang de gebruiker de 'view product' permission heeft, mag hij elk product zien
+        // (Je zou hier eventueel ook kunnen checken op tenant_id)
+        return $user->can('view product');
+    }
+
+    /**
+     * Bepaalt of de gebruiker een nieuw product mag aanmaken.
+     */
+    public function create(User $user): bool
+    {
+        // Gebruiker moet over de juiste permissie beschikken
+        return $user->can('create product');
+    }
+
+    /**
+     * Bepaalt of de gebruiker een bestaand product mag bewerken.
+     */
+    public function update(User $user, Product $product): bool
+    {
+        // Een gebruiker mag een product bijwerken als hij tot hetzelfde bedrijf (tenant) behoort én hij daarvoor gemachtigd is.
+        return $product->tenant_id === $user->tenant_id && $user->can('update product');
+    }
+
+    /**
+     * Bepaalt of de gebruiker een product mag verwijderen.
+     */
+    public function delete(User $user, Product $product): bool
+    {
+        // Zelfde als update: alleen binnen eigen tenant en met de juiste permissie
+        return $product->tenant_id === $user->tenant_id && $user->can('delete product');
+    }
+}

@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Livewire\SuperAdmin\Tenants;
+
+use Livewire\Component;
+use App\Models\Tenant;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+
+class TenantCreate extends Component
+{
+    public $website_name;
+    public $owner_name;
+    public $owner_email;
+    public $domain;
+    public $password;
+    public $password_confirmation;
+    public $status = 'active';
+
+    protected function rules()
+    {
+        return [
+            'website_name' => 'required|min:3',
+            'owner_name' => 'required|min:3',
+            'owner_email' => ['required', 'email'],
+            'domain' => 'required|unique:domains,domain',
+            'password' => 'required|min:8|confirmed',
+            // De waarde van status moet 'active' of 'suspended' zijn
+            'status' => ['required', Rule::in(['active', 'suspended'])],
+        ];
+    }
+
+    public function render()
+    {
+        $this->authorize('create', Tenant::class);
+        return view('livewire.super-admin.tenants.tenant-create');
+    }
+
+    public function createTenant()
+    {
+        $this->authorize('create', Tenant::class);
+        $this->validate();
+        $this->domain = trim($this->domain);
+        // Indien geen punt aanwezig is (zoals bij subdomein), dan toevoegen aan hoofddomein
+        $this->domain = Str::contains($this->domain, '.')
+            ? $this->domain
+            : Str::slug($this->domain).'.'. request()->getHost();
+
+        $this->validate(); // Nogmaals valideren (na wijziging domein)
+        // Alles in een DB-transactie
+        DB::transaction(function () {
+            $tenant = Tenant::create([
+                'website_name' => $this->website_name,
+                'status' => $this->status,
+            ]);
+            // Domein koppelen aan tenant (multitenancy via domains tabel)
+            $tenant->domains()->create(['domain' => $this->domain]);
+            // Eigenaar gebruiker aanmaken en koppelen aan tenant
+            $tenant->users()->create([
+                'name' => $this->owner_name,
+                'email' => $this->owner_email,
+                'password' => Hash::make($this->password),
+                'is_admin' => true, // Eerste user is tenant admin
+            ]);
+        });
+
+        session()->flash('message', 'Tenant succesvol aangemaakt.');
+        session()->flash('message_type', 'success');
+        return $this->redirect(route('tenants.index'), true);
+    }
+}

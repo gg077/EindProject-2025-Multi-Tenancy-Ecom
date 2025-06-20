@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Livewire\SuperAdmin\Users;
+
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
+use Illuminate\Validation\Rule;
+
+class CreateUser extends Component
+{
+    public $name = '';
+    public $email = '';
+    public $password = '';
+    public $password_confirmation = '';
+    public $role; // Standaard rol
+
+    public function mount()
+    {
+        $this->authorize('create', User::class);
+    }
+
+    public function save()
+    {
+        $this->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->where('tenant_id', tenant('id'))->where('deleted_at', null)],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'string',
+                function ($attribute, $value, $fail) {
+                if (!Role::where('name', $this->role)->exists()) { // Controleert of de opgegeven rol echt bestaat in de database.
+                    $fail('De rol is ongeldig.');
+                }
+            }],
+        ]);
+
+        DB::transaction(function () {
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'password' => Hash::make($this->password),
+                'is_admin' => 1,
+            ]);
+
+            // Ken de geselecteerde rol toe
+            $user->assignRole($this->role);
+        });
+
+        session()->flash('message', 'Gebruiker succesvol aangemaakt.');
+        session()->flash('message_type', 'success');
+
+        return $this->redirect(route('users.index'), true);
+    }
+
+    public function render()
+    {
+        return view('livewire.super-admin.users.create-user', [
+            'roles' => ['' => 'Selecteer rol'] + Role::pluck('name', 'name')->toArray(),
+        ]);
+    }
+}
