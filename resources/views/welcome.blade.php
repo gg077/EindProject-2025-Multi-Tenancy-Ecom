@@ -60,16 +60,16 @@
         </svg>
     </div>
 
-    <div class="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center justify-between">
+    <div class="container mx-auto px-6 flex flex-col items-center justify-center text-center">
         <!-- Text Content -->
-        <div class="lg:w-1/2 mt-10 lg:mt-0 text-center lg:text-left">
+        <div class="max-w-2xl">
             <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
                 Launch Your Digital Store — Fast, Free & Limitless
             </h1>
             <p class="text-lg text-gray-600 mb-8">
                 Sell digital products, manage teams, and track analytics with zero monthly costs. Everything you need. All in one place.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="{{ route('tenant.register') }}"
                    class="px-6 py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-800 transition">
                     Create Your Store
@@ -80,13 +80,9 @@
                 </a>
             </div>
         </div>
-
-        <!-- Image -->
-        <div class="lg:w-1/2 text-center">
-            <img src="/web/img/hero-dashboard-preview.png" alt="Dashboard Preview" class="w-full max-w-lg mx-auto rounded-xl shadow-md">
-        </div>
     </div>
 </section>
+
 
 
 
