@@ -44,6 +44,7 @@
             <div>
                 <label class="block mb-1 text-black dark:text-white">Download Link</label>
                 <input type="url" wire:model="download_link" class="border p-2 rounded w-full text-black dark:text-white dark:bg-gray-700 dark:border-gray-600" placeholder="https://example.com/download/file.zip">
+                <span class="text-sm text-gray-500 dark:text-gray-400">"Voeg hier je Dropbox.com link toe"</span>
                 @error('download_link') <p class="text-red-500 dark:text-red-400 text-sm mt-1">{{ $message }}</p> @enderror
             </div>
 
