@@ -115,7 +115,7 @@ In `config/tenancy.php`:
 ```php
  'central_domains' => [
         '127.0.0.1',
-        'multi-tenant.pk',
+        'digimarket.be', // verander dit naar de central domein naam = deze naam moet ook in de hostfile staan
     ]
 ```
 
@@ -133,12 +133,12 @@ Pas dit aan op basis van jouw omgeving.
 ::1 localhost
 
 # Multi-tenancy domeinen
-127.0.0.1 multi-tenant.pk
-127.0.0.1 tenant1.multi-tenant.pk
-127.0.0.1 tenant2.multi-tenant.pk
-127.0.0.1 tenant3.multi-tenant.pk
-127.0.0.1 larishop.multi-tenant.pk
-127.0.0.1 larishop2.multi-tenant.pk
+127.0.0.1 digimarket.be
+127.0.0.1 tenant1.digimarket.be
+127.0.0.1 tenant2.digimarket.be
+127.0.0.1 tenant3.digimarket.be
+127.0.0.1 larishop.digimarket.be
+127.0.0.1 larishop2.digimarket.be
 ```
 
 `.env` voorbeeld:
